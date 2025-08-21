@@ -56,11 +56,7 @@ plugins:
 custom:
   pythonRequirements:
     dockerizePip: false  
-    layer: 
-      name: ${self:service}-${self:provider.stage}-requirements
-      description: "Python requirements layer for ${self:service}"
-      compatibleRuntimes:
-        - python3.9
+    layer: true
     slim: true
     strip: false
     zip: true
