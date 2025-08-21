@@ -49,8 +49,6 @@ functions:
       - httpApi:
           path: "/{proxy+}"
           method: ANY
-    # Configuraciones específicas de la función
-    reservedConcurrency: 10  # Limita concurrencia para evitar costos
     
 plugins:
   - serverless-python-requirements
