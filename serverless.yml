@@ -1,0 +1,68 @@
+service: btg-pactual-api
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-1
+  memorySize: 512
+  timeout: 15
+  stage: ${opt:stage, 'dev'}
+  
+  environment:
+    STAGE: ${self:provider.stage}
+    MONGO_URI: ${env:MONGO_URI}
+    DATABASE_NAME: ${env:DATABASE_NAME}
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_ALGORITHM: ${env:JWT_ALGORITHM}
+    ACCESS_TOKEN_MINUTES: ${env:ACCESS_TOKEN_MINUTES}
+  
+  iam:
+    role:
+      statements:
+        # Permisos mínimos para logs
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+
+package:
+  patterns:
+    - "app/**"
+    - "requirements.txt"
+    - "!venv/**"
+    - "!.git/**"
+    - "!.pytest_cache/**"
+    - "!**/__pycache__/**"
+    - "!node_modules/**"
+    - "!.env*"
+
+functions:
+  api:
+    handler: app.main.handler
+    events:
+      - httpApi:
+          path: /
+          method: ANY
+      - httpApi:
+          path: "/{proxy+}"
+          method: ANY
+    # Configuraciones específicas de la función
+    reservedConcurrency: 10  # Limita concurrencia para evitar costos
+    
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    layer: 
+      name: ${self:service}-${self:provider.stage}-requirements
+      description: "Python requirements layer for ${self:service}"
+      compatibleRuntimes:
+        - python3.11
+    slim: true
+    strip: false
+    zip: true
