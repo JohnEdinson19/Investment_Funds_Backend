@@ -1,5 +1,5 @@
 service: btg-pactual-api
-frameworkVersion: "4"
+frameworkVersion: "3"
 
 provider:
   name: aws
