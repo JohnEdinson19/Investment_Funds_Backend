@@ -57,7 +57,7 @@ plugins:
 
 custom:
   pythonRequirements:
-    dockerizePip: true
+    dockerizePip: false  
     layer: 
       name: ${self:service}-${self:provider.stage}-requirements
       description: "Python requirements layer for ${self:service}"
