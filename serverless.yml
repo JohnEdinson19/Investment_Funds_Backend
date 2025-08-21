@@ -3,7 +3,7 @@ frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: python3.11
+  runtime: python3.9
   region: us-east-1
   memorySize: 512
   timeout: 15
@@ -62,7 +62,7 @@ custom:
       name: ${self:service}-${self:provider.stage}-requirements
       description: "Python requirements layer for ${self:service}"
       compatibleRuntimes:
-        - python3.11
+        - python3.9
     slim: true
     strip: false
     zip: true
