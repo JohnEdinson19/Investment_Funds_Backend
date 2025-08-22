@@ -59,7 +59,7 @@ jobs:
         id: set-stage
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "stage=prod" >> $GITHUB_OUTPUT
+            echo "stage=dev" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
             echo "stage=dev" >> $GITHUB_OUTPUT
           else
