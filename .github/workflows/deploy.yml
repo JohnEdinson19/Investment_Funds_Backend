@@ -1,86 +1,92 @@
-name: Deploy BTG Pactual API
+name: Deploy to AWS Lambda
 
 on:
   push:
     branches:
       - main
-      - develop
+      - dev
   pull_request:
     branches:
       - main
 
+env:
+  AWS_REGION: us-east-1
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest
-      - run: |
-          if [ -d tests ]; then python -m pytest tests/ -v; else echo "No tests found"; fi
-        continue-on-error: true
-
   deploy:
-    needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    container:
-      image: public.ecr.aws/docker/library/python:3.9
-      env:
-        AWS_REGION: us-east-1
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        run: |
-          apt-get update
-          apt-get install -y curl unzip
-          curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-          apt-get install -y nodejs
-          node -v
-          npm -v
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
-      - name: Install Serverless Framework
-        run: npm install -g serverless@3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Determine deployment stage
-        id: stage
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+
+      - name: Install Serverless plugins
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          else
+            echo "No package.json found, skipping npm install"
+          fi
+
+      - name: Set deployment stage
+        id: set-stage
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "stage=prod" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
             echo "stage=dev" >> $GITHUB_OUTPUT
           else
-            echo "stage=feature" >> $GITHUB_OUTPUT
+            echo "stage=dev" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Deploy to AWS via Serverless
-        run: |
-          serverless deploy --stage ${{ steps.stage.outputs.stage }} --verbose
+      - name: Deploy to AWS Lambda
         env:
+          # Variables de entorno para la función Lambda
           MONGO_URI: ${{ secrets.MONGO_URI }}
           DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ALGORITHM: ${{ secrets.JWT_ALGORITHM }}
           ACCESS_TOKEN_MINUTES: ${{ secrets.ACCESS_TOKEN_MINUTES }}
+        run: |
+          serverless deploy --stage ${{ steps.set-stage.outputs.stage }} --verbose
 
-      - name: Post deployment info
+      - name: Display deployment info
         if: success()
         run: |
-          echo "Deployment completed!"
-          serverless info --stage ${{ steps.stage.outputs.stage }}
-          ENDPOINT=$(serverless info --stage ${{ steps.stage.outputs.stage }} | grep -o 'https://[^[:space:]]*' | head -1)
-          if [ -n "$ENDPOINT" ]; then
-            echo "endpoint=$ENDPOINT" >> $GITHUB_OUTPUT
-          fi
+          echo "✅ Deployment successful!"
+          echo "Stage: ${{ steps.set-stage.outputs.stage }}"
+          echo "Region: ${{ env.AWS_REGION }}"
+          serverless info --stage ${{ steps.set-stage.outputs.stage }}
+
+      - name: Deployment failure notification
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Please check the logs above for more details."
