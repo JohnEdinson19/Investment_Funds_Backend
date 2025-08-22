@@ -7,7 +7,7 @@ provider:
   memorySize: 512
   timeout: 15
   stage: ${opt:stage, 'dev'}
-  
+
   environment:
     STAGE: ${self:provider.stage}
     MONGO_URI: ${env:MONGO_URI}
@@ -15,11 +15,10 @@ provider:
     JWT_SECRET: ${env:JWT_SECRET}
     JWT_ALGORITHM: ${env:JWT_ALGORITHM}
     ACCESS_TOKEN_MINUTES: ${env:ACCESS_TOKEN_MINUTES}
-  
+
   iam:
     role:
       statements:
-        # Permisos mínimos para logs
         - Effect: Allow
           Action:
             - logs:CreateLogGroup
@@ -28,6 +27,7 @@ provider:
           Resource: "*"
 
 package:
+  individually: false
   patterns:
     - "app/**"
     - "requirements.txt"
@@ -42,19 +42,15 @@ functions:
   api:
     handler: app.main.handler
     events:
-      - httpApi:
-          path: /
-          method: ANY
-      - httpApi:
-          path: "/{proxy+}"
-          method: ANY
-    
+      - httpApi: '*'
+
 plugins:
   - serverless-python-requirements
 
 custom:
   pythonRequirements:
-    dockerizePip: false
+    dockerizePip: non-linux
+    layer: false
     slim: true
     strip: false
     zip: true
