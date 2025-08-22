@@ -15,11 +15,10 @@ El backend está desplegado usando **Serverless Framework** que genera automáti
 
 - **Amazon ECR Repository**: `serverless-btg-pactual-api-dev`
   - Almacena las imágenes Docker del backend
-  - URL: `https://k3kbiwfs2k.execute-api.us-east-1.amazonaws.com`
 
 ### Despliegue Automatizado (GitHub Actions)
 El proyecto incluye CI/CD automático que se ejecuta en:
-- Push a rama `develop` → Deploy a stage `dev`
+- Push a rama `dev` → Deploy a stage `dev`
 - Push a rama `main` → Deploy a stage `prod`
 
 # Recursos AWS - BTG Pactual Investment Funds Backend
@@ -41,9 +40,6 @@ El proyecto incluye CI/CD automático que se ejecuta en:
 ### 🌐 **Amazon API Gateway (HTTP API)**
 - **API ID**: `k3kbiwfs2k`
 - **Tipo**: HTTP API (más económico que REST API)
-- **Endpoints**: 
-  - `ANY /` 
-  - `ANY /{proxy+}`
 - **URL**: `https://k3kbiwfs2k.execute-api.us-east-1.amazonaws.com`
 - **Justificación**: Punto de entrada HTTP para el backend con throttling y caching automático
 
@@ -80,14 +76,6 @@ El proyecto incluye CI/CD automático que se ejecuta en:
 - **Región Principal**: `us-east-1` (Virginia)
 - **Justificación**: Menor latencia para usuarios, costos optimizados
 - **Disponibilidad**: Multi-AZ automática en Lambda y API Gateway
-
-## Consideraciones de Costo
-
-- **Lambda**: Pay-per-request (sin costo cuando no se usa)
-- **API Gateway HTTP**: Más económico que REST API
-- **ECR**: Storage mínimo para imágenes
-- **CloudWatch**: Solo logs necesarios
-- **Estimado mensual**: ~$5-10 USD para tráfico bajo-medio
 
 # Justificación de la Arquitectura - BTG Pactual Investment Funds Backend
 
