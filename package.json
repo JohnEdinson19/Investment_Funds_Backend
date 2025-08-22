@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "serverless-docker": "^0.0.5",
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-python-requirements": "^6.1.2"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

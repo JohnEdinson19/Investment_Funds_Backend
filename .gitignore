@@ -49,7 +49,6 @@ npm-debug.log
 yarn-error.log
 
 #deployments
-package-lock.json
-package.json
 .requirements.zip
 .serverless
+ScripSQL.sql
