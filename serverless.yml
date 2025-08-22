@@ -2,33 +2,22 @@ service: btg-pactual-api
 
 provider:
   name: aws
-  runtime: python3.9
+  # Para funciones containerizadas no especifiques runtime
   region: us-east-1
   memorySize: 512
   timeout: 15
   stage: ${opt:stage, 'dev'}
-
-  environment:
-    STAGE: ${self:provider.stage}
-    MONGO_URI: ${env:MONGO_URI}
-    DATABASE_NAME: ${env:DATABASE_NAME}
-    JWT_SECRET: ${env:JWT_SECRET}
-    JWT_ALGORITHM: ${env:JWT_ALGORITHM}
-    ACCESS_TOKEN_MINUTES: ${env:ACCESS_TOKEN_MINUTES}
-
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-          Resource: "*"
+  ecr:
+    images:
+      my-lambda-function:
+        path: .
+        file: Dockerfile
+        platform: linux/amd64  # Importante para compatibilidad
 
 functions:
   api:
-    handler: app.main.handler
+    image:
+      name: my-lambda-function
     events:
       - httpApi:
           path: /
@@ -37,15 +26,9 @@ functions:
           path: "/{proxy+}"
           method: ANY
 
-plugins:
-  - serverless-python-requirements
+# plugins:
+#   - serverless-docker  # No necesario con imágenes ECR nativas
 
-custom:
-  pythonRequirements:
-    dockerizePip: non-linux
-    useDownloadCache: false
-    useStaticCache: false
-    layer: false
-    slim: true
-    strip: false
-    zip: false
+# custom:
+#   docker:
+#     file: Dockerfile  # No necesario con configuración ECR nativa
