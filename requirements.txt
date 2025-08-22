@@ -1,3 +1,5 @@
+mangum==0.17.0
+
 # Framework principal
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
