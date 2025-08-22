@@ -45,7 +45,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: npm install -g serverless@3.38.0
 
       - name: Install Serverless plugins
         run: |
