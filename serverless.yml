@@ -26,23 +26,16 @@ provider:
             - logs:PutLogEvents
           Resource: "*"
 
-package:
-  individually: false
-  patterns:
-    - "app/**"
-    - "requirements.txt"
-    - "!venv/**"
-    - "!.git/**"
-    - "!.pytest_cache/**"
-    - "!**/__pycache__/**"
-    - "!node_modules/**"
-    - "!.env*"
-
 functions:
   api:
     handler: app.main.handler
     events:
-      - httpApi: '*'
+      - httpApi:
+          path: /
+          method: ANY
+      - httpApi:
+          path: "/{proxy+}"
+          method: ANY
 
 plugins:
   - serverless-python-requirements
@@ -55,4 +48,4 @@ custom:
     layer: false
     slim: true
     strip: false
-    zip: true
+    zip: false
