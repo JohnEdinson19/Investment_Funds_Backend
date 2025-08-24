@@ -27,7 +27,7 @@ async def send_notification(user: dict, message: str):
             msg['Subject'] = "Notificación Importante"
             
             body = f"""
-            Hola {user.get('name', 'Usuario')},
+            Hola {user.get('username', 'Usuario')},
             
             {message}
             
