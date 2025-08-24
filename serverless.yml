@@ -13,6 +13,21 @@ provider:
         file: Dockerfile
         platform: linux/amd64
 
+  environment:
+    MONGO_URI: ${env:MONGO_URI}
+    DATABASE_NAME: ${env:DATABASE_NAME}
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_ALGORITHM: ${env:JWT_ALGORITHM}
+    ACCESS_TOKEN_MINUTES: ${env:ACCESS_TOKEN_MINUTES}
+    SMTP_SERVER: ${env:SMTP_SERVER}
+    SMTP_PORT: ${env:SMTP_PORT}
+    SMTP_USERNAME: ${env:SMTP_USERNAME}
+    SMTP_PASSWORD: ${env:SMTP_PASSWORD}
+    FROM_EMAIL: ${env:FROM_EMAIL}
+    TWILIO_ACCOUNT_SID: ${env:TWILIO_ACCOUNT_SID}
+    TWILIO_AUTH_TOKEN: ${env:TWILIO_AUTH_TOKEN}
+    TWILIO_PHONE_NUMBER: ${env:TWILIO_PHONE_NUMBER}
+
 functions:
   api:
     image:
