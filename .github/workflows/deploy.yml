@@ -68,23 +68,33 @@ jobs:
 
       - name: Deploy to AWS Lambda
         env:
-          # Variables de entorno para la función Lambda
           MONGO_URI: ${{ secrets.MONGO_URI }}
           DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ALGORITHM: ${{ secrets.JWT_ALGORITHM }}
           ACCESS_TOKEN_MINUTES: ${{ secrets.ACCESS_TOKEN_MINUTES }}
-          # Para Gmail
           SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
-          # Twilio Configuration
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
           TWILIO_PHONE_NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
         run: |
+          export MONGO_URI="${MONGO_URI}"
+          export DATABASE_NAME="${DATABASE_NAME}"
+          export JWT_SECRET="${JWT_SECRET}"
+          export JWT_ALGORITHM="${JWT_ALGORITHM}"
+          export ACCESS_TOKEN_MINUTES="${ACCESS_TOKEN_MINUTES}"
+          export SMTP_SERVER="${SMTP_SERVER}"
+          export SMTP_PORT="${SMTP_PORT}"
+          export SMTP_USERNAME="${SMTP_USERNAME}"
+          export SMTP_PASSWORD="${SMTP_PASSWORD}"
+          export FROM_EMAIL="${FROM_EMAIL}"
+          export TWILIO_ACCOUNT_SID="${TWILIO_ACCOUNT_SID}"
+          export TWILIO_AUTH_TOKEN="${TWILIO_AUTH_TOKEN}"
+          export TWILIO_PHONE_NUMBER="${TWILIO_PHONE_NUMBER}"
           serverless deploy --stage ${{ steps.set-stage.outputs.stage }} --verbose
 
       - name: Display deployment info
