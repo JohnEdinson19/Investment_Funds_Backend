@@ -14,11 +14,12 @@ python-dotenv==1.0.1
 pydantic-settings==2.10.1
 python-jose==3.5.0
 python-multipart==0.0.20
+twilio==9.7.1
 
 # Seguridad
 PyJWT==2.9.0
 passlib==1.7.4
-bcrypt==4.3.0
+bcrypt==3.2.2
 
 # Testing
 pytest==8.3.3
